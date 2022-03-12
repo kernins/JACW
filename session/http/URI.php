@@ -21,7 +21,7 @@ class URI
             //so using RegExp for spliting, no validation performed/intended here
          
             $m = null;
-            if(!preg_match('/^(?:(https?):\/\/)?([^\s\/:]+?)(?::(\d+))?(\/[^?]*?)?(?:\?([^#]+))?(?:#.*)?$/ui', $uri, $m))
+            if(!preg_match('/^(?:(https?):\/\/)?([^\s\/:]+?)(?::(\d+))?(\/[^\s?]*?)?(?:\?([^\s#]+))?(?:#.*)?$/ui', $uri, $m))
                throw new exception\UnexpectedValueException('Malformed URI given: '.$uri);
             
             $this->host = $m[2]; //at least 1 char is guaranteed by RE, treating as valid locally-defined (/etc/hosts)
@@ -59,6 +59,7 @@ class URI
       //TODO: move to FS util
       private function _canonicalizePath(string $path, string $sep='/'): string
          {
+            //expects path to be trimmed & nonempty
             $parts = [];
             foreach(explode($sep, $path) as $part)
                {
@@ -69,7 +70,7 @@ class URI
                   else throw new \UnexpectedValueException('Invalid path given');
                }
 
-            return $sep.implode($sep, $parts);
+            return $sep.implode($sep, $parts).($path[-1]===$sep? $sep : '');
          }
       
       

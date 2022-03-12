@@ -10,7 +10,7 @@ class Handler extends session\HandlerAbstract
       
       protected function initHandlers(): void
          {
-            $this->response = new Response();
+            $this->response = new Response(new session\InfoProvider($this->hndl));
             curl_setopt($this->hndl, CURLOPT_HEADERFUNCTION, function($cHndl, string $line) {
                $dLen = strlen($line);
                if(strlen($line=trim($line)) > 0)

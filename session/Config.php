@@ -25,6 +25,11 @@ class Config
       
       
       
+      final public function merge(self $cfg): self
+         {
+            return $this->setOpts($cfg->toArray());
+         }
+         
       /**
        * Generic transparent bulk setter
        * No opt/value filtering/validation/normalization is performed
@@ -85,14 +90,18 @@ class Config
          
          }
          
-      public function conTimo(): self
+      public function conTimo(int $timo): self
          {
-         
+            //TODO: float support?
+            $this->setOpt(CURLOPT_CONNECTTIMEOUT, $timo);
+            return $this;
          }
          
-      public function opTimo(): self
+      public function sessTimo(int $timo): self
          {
-         
+            //TODO: float support?
+            $this->setOpt(CURLOPT_TIMEOUT, $timo);
+            return $this;
          }
          
          

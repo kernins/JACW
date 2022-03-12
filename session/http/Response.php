@@ -1,9 +1,9 @@
 <?php
 namespace lib\dp\Curl\session\http;
-use lib\dp\Curl\session\IResponse, lib\dp\Curl\exception;
+use lib\dp\Curl\session, lib\dp\Curl\exception;
 
 
-Class Response implements IResponse
+Class Response implements session\IResponse
    {   
       /**
        * A stack of header lists from all responses in chronological order
@@ -11,16 +11,18 @@ Class Response implements IResponse
        * 
        * @var headers\Response[]
        */
-      private array              $_headersStack = [];
-      private cookies\Response   $_cookies;
+      private array                 $_headersStack = [];
+      private cookies\Response      $_cookies;
       
-      protected                  $data = null;
+      protected                     $data = null;
+      
+      private session\InfoProvider  $_infoProvider;
       
       
       
-      public function __construct()
+      public function __construct(session\InfoProvider $infoProvider)
          {
-            
+            $this->_infoProvider = $infoProvider;
          }
       
       
@@ -42,6 +44,29 @@ Class Response implements IResponse
             return $this;
          }
       
+      
+      public function getStatusCode(): int
+         {
+            return $this->_infoProvider->get(CURLINFO_RESPONSE_CODE);
+         }
+      
+      
+      //TODO: refactor
+      final public function getData()
+         {
+            //TODO: use null-safe for php8
+            if(!empty($this->data) && !empty($hdrs=$this->getHeaders()) && !empty($ct=$hdrs->getContentType()))
+               {
+                  if(strncasecmp($ct, 'application/json', 16) === 0) $data = json_decode($this->data, true, 512, JSON_THROW_ON_ERROR);
+                  else $data = $this->data;
+               }
+            return $data;
+         }
+      
+      final public function getDataRaw(): string
+         {
+            return $this->data;
+         }
          
       final public function getHeaders(?int $idx = null): ?headers\Response
          {

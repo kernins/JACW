@@ -6,9 +6,15 @@ $loader->registerNamespacePath('lib\dp\Curl', __DIR__)->register();
 
 
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://srvweb.com/redirwithcook.php'));
-$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('https://google.ru'));
+$req = new \lib\dp\Curl\session\http\request\POST(new \lib\dp\Curl\session\http\URI('http://srvweb.com/json.php'));
+$req->postFormWwwUrlencoded('foo=bar&baz=kek');
+$req->postMultipartFormData(['foo'=>'bar', 'baz'=>'kek']);
+$req->postRawJSON(['foo'=>'bar', 'baz'=>'kek']);
+$req->setAuth('Bearer', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXJ2ZXIiOiJzdGFnaW5nLWludGVncmF0aW9uLnBvc2lvcy5jb20iLCJzdWIiOiIyNjA1OSIsImF1ZCI6InVzZXJhZG1pbiIsImd0cCI6ImF1dGhvcml6YXRpb25fY29kZSIsImlzcyI6IkxpZ2h0c3BlZWQiLCJleHAiOjE2NDY3ODA1NDMsImlhdCI6MTY0Njc3Njk0MywiZGlkIjoiYXBpIiwiY2xpZW50X2lkIjoiZ2Y1bVBMNGFSWk9nSUxpRUFvUUE0Y2dhckM2ZVVKVzciLCJqdGkiOiI2ODY3Y2Y2Yy0wOTIxLTRmMmEtODBjZS04MGQ2OWZmZTM1MGYiLCJjaWQiOjE1MTg5fQ.Le5jrSDK3EhWVg0WBiIsKP-p5JAkhPLiLebDx2OsrgM');
+//$req->setAuth('Basic', 'user', 'passwd');
+//$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('https://google.ru'));
 $cfg = new \lib\dp\Curl\session\http\Config();
-$cfg->returnTransfer(false);
+//$cfg->returnTransfer(false);
 
 /*$locs=[
    'https://google.com',
@@ -35,7 +41,7 @@ foreach($locs as $l)
 die();*/
 
 $file= fopen('/tmp/heap/user/1000/heap/curl.txt', 'w');
-$cfg->setOpt(CURLOPT_FILE, $file);
+//$cfg->setOpt(CURLOPT_FILE, $file);
 
 /*
  * my_cookie =
@@ -60,15 +66,16 @@ $cfg->setOpt(CURLOPT_COOKIELIST, '');
 $cfg->setOpt(CURLINFO_HEADER_OUT, true);
 
 $sess=new \lib\dp\Curl\session\http\Handler($req, $cfg);
-$resp=$sess->init()->exec();
+$resp=$sess->init()->exec()->getResponse();
 //$resp2=$sess->exec();
 //$resp2=$sess->testChgUri('https://yandex.ru')->exec();
 
 fclose($file);
 
-var_dump($resp, $resp2);
-var_dump($resp->getCookies());
+//var_dump($resp, $resp->getHTTPCode());
 //var_dump($resp->getCookies());
+//var_dump($resp->getCookies());
+var_dump($resp->getStatusCode(), $resp->getData());
 
 
 /*new \lib\dp\Curl\session\http\URI('google.ru');

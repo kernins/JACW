@@ -13,13 +13,27 @@ abstract class HandlerAbstract
       
       public function __construct(?IRequest $request=null, ?Config $config = null)
          {
-            if($request !== null) $this->request = $request;
-            if($config !== null) $this->config = $config;
+            if($request !== null) $this->setRequest($request);
+            if($config !== null) $this->setConfig($config);
          }
          
       public function __destruct()
          {
             if($this->hndl !== null) curl_close($this->hndl);
+         }
+         
+         
+      public function setRequest(IRequest $req): self
+         {
+            $this->request = $req;
+            return $this;
+         }
+         
+      public function setConfig(Config $cfg): self
+         {
+            if(empty($this->config)) $this->config = $cfg; //TODO: clone?
+            else $this->config->merge($cfg);
+            return $this;
          }
          
          
@@ -36,18 +50,12 @@ abstract class HandlerAbstract
       abstract protected function initHandlers(): void;
          
          
-      public function exec()
+      public function exec(): self
          {
             $resp = curl_exec($this->hndl);
-            //check success, check file
+            //var_dump(curl_getinfo($this->hndl,  CURLINFO_HEADER_OUT));
             $this->getResponse()->setData($resp);
-            //var_dump(curl_getinfo($this->hndl, CURLINFO_COOKIELIST), curl_getinfo($this->hndl, CURLINFO_HEADER_OUT));
-            
-            /*$cooks=new http\cookies\Response();
-            foreach(curl_getinfo($this->hndl, CURLINFO_COOKIELIST) as $c) $cooks->setFromNetscape($c);
-            var_dump($cooks);*/
-            
-            return $this->getResponse();
+            return $this;
          }
          
       abstract public function getResponse(): IResponse;
