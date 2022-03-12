@@ -32,7 +32,18 @@ class Handler extends session\HandlerAbstract
                return $dLen;
             });
          }
-         
+      
+      
+      public function setConfig(session\Config $cfg): self
+         {
+            parent::setConfig(
+               //casting to http\Config if necessary
+               $cfg instanceof Config? $cfg : new Config($cfg->toArray())
+            );
+            return $this;
+         }
+      
+      
       public function getResponse(): Response
          {
             return $this->response;

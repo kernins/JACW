@@ -45,14 +45,14 @@ final class Response extends BaseList
          }
       
       
-      public function getRedirLocation(): ?string
+      public function getRedirLocationRaw(): ?string
          {
             return ($this->_statusCode >= 300) && ($this->_statusCode < 400)? $this->get('Location') : null;
          }
          
-      public function getRedirLocationURI(): ?http\URI
+      public function getRedirLocation(): ?http\URI
          {
-            if(!empty($loc=$this->getRedirLocation()))
+            if(!empty($loc=$this->getRedirLocationRaw()))
                {
                   //$loc should be standarts-conformant here, so parse_uri() should be fine
                   $locParts = parse_url($loc);

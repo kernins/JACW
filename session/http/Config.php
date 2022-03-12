@@ -17,4 +17,11 @@ class Config extends session\Config
          CURLOPT_HEADER          => false    //headers are meant to be handled by CURLOPT_HEADERFUNCTION
       ] + parent::OPTS_LOCKED;*/
       
+      
+      
+      public function followLocation(bool $follow): self
+         {
+            $this->setOpt(CURLOPT_FOLLOWLOCATION, $follow);
+            return $this;
+         }
    }

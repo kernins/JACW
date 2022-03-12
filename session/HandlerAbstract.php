@@ -36,7 +36,12 @@ abstract class HandlerAbstract
             return $this;
          }
          
-         
+      public function getConfig(): Config
+         {
+            return $this->config;
+         }
+      
+      
       final public function init(): self
          {
             $this->hndl = curl_init();

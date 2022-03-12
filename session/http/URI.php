@@ -84,6 +84,17 @@ class URI
             return $this->path;
          }
          
+      final public function getQuery(): ?array
+         {
+            if(!empty($this->query))
+               {
+                  $res = [];
+                  parse_str($this->query, $res);
+                  return $res;
+               }
+            return null;
+         }
+         
       final public function getPathDir(): string
          {
             return preg_replace('/\/[^\/]*$/', '', $this->getPath()).'/';
