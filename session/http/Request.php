@@ -35,31 +35,11 @@ class Request implements IRequest
             return $this;
          }
          
-         
-      //TODO: refactor to separate classes?
-      public function setAuth(string $type, string ...$data): self
+      
+      public function setAuth(IAuth $auth): self
          {
             //TODO: refactor, don't use opts?
-            switch(strtolower($type))
-               {
-                  case 'basic':
-                     //CURLOPT_USERPWD is deprecated, and prevents use of ':' in passwd
-                     if(count($data) != 2) throw new exception\UnexpectedValueException(
-                        'Basic auth requires both username & password to be specified as separate args'
-                     );
-                     $this->opts = [
-                        CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-                        CURLOPT_USERNAME => $data[0],
-                        CURLOPT_PASSWORD => $data[1]
-                     ] + $this->opts;
-                     break;
-                  case 'bearer':
-                     $this->opts[CURLOPT_HTTPAUTH] = CURLAUTH_BEARER;
-                     $this->opts[CURLOPT_XOAUTH2_BEARER] = $data[0];
-                     break;
-                  default:
-                     throw new exception\UnexpectedValueException('Unknown auth method: '.$type);
-               }
+            $this->opts = $auth->toArray() + $this->opts;
             return $this;
          }
       
