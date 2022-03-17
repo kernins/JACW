@@ -43,6 +43,13 @@ Class Response implements session\IResponse
             $this->data = $data;
             return $this;
          }
+         
+      public function appendData(string $chunk): self
+         {
+            if($this->data === null) $this->data = $chunk;
+            else $this->data .= $chunk;
+            return $this;
+         }
       
       
       public function getStatusCode(): int
@@ -55,15 +62,14 @@ Class Response implements session\IResponse
       final public function getData()
          {
             //TODO: use null-safe for php8
-            if(!empty($this->data) && !empty($hdrs=$this->getHeaders()) && !empty($ct=$hdrs->getContentType()))
+            if(!empty($data=$this->data) && !empty($hdrs=$this->getHeaders()) && !empty($ct=$hdrs->getContentType()))
                {
-                  if(strncasecmp($ct, 'application/json', 16) === 0) $data = json_decode($this->data, true, 512, JSON_THROW_ON_ERROR);
-                  else $data = $this->data;
+                  if(strncasecmp($ct, 'application/json', 16) === 0) $data = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
                }
             return $data;
          }
       
-      final public function getDataRaw(): string
+      final public function getDataRaw(): ?string
          {
             return $this->data;
          }

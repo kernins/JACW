@@ -1,13 +1,14 @@
 <?php
 namespace lib\dp\Curl\session;
+use lib\dp\Curl\exception;
 
 
 abstract class HandlerAbstract
    {
-      protected $hndl = null;
+      protected \CurlHandle   $hndl;
       
-      protected Config     $config;
-      protected IRequest   $request;
+      protected Config        $config;
+      protected IRequest      $request;
    
       
       
@@ -19,10 +20,10 @@ abstract class HandlerAbstract
          
       public function __destruct()
          {
-            if($this->hndl !== null) curl_close($this->hndl);
+            if(!empty($this->hndl)) curl_close($this->hndl);
          }
-         
-         
+      
+      
       public function setRequest(IRequest $req): self
          {
             $this->request = $req;
@@ -35,10 +36,25 @@ abstract class HandlerAbstract
             else $this->config->merge($cfg);
             return $this;
          }
-         
+      
+      
       public function getConfig(): Config
          {
             return $this->config;
+         }
+      
+         
+      public function getHandle(): \CurlHandle
+         {
+            if(empty($this->hndl)) throw new exception\BadMethodCallException(
+               __METHOD__.'() must not be called before curl session is initialized'
+            );
+            return $this->hndl;
+         }
+      
+      public function isInitialized(): bool
+         {
+            return !empty($this->hndl);
          }
       
       
@@ -47,7 +63,13 @@ abstract class HandlerAbstract
             $this->hndl = curl_init();
             curl_setopt_array($this->hndl, $this->config->toArray());
             curl_setopt_array($this->hndl, $this->request->toArray());
+            //curl_setopt($this->hndl, CURLOPT_PRIVATE, ['foo'=>'userdata', 'url'=>new http\URI('yandex.net')]);
             $this->initHandlers();
+            
+            curl_setopt($this->hndl, CURLOPT_WRITEFUNCTION, function(\CurlHandle $hndl, $chunk){
+               $this->getResponse()->appendData($chunk);
+               return strlen($chunk);
+            });
             
             return $this;
          }
@@ -59,7 +81,8 @@ abstract class HandlerAbstract
          {
             $resp = curl_exec($this->hndl);
             //var_dump(curl_getinfo($this->hndl,  CURLINFO_HEADER_OUT));
-            $this->getResponse()->setData($resp);
+            //var_dump(curl_getinfo($this->hndl, CURLINFO_PRIVATE));
+            //$this->getResponse()->setData($resp);
             return $this;
          }
          

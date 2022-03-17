@@ -6,7 +6,7 @@ use lib\dp\Curl\IStream, lib\dp\Curl\exception;
 class Config
    {
       protected const OPTS_DEFAULT = [
-         CURLOPT_RETURNTRANSFER  => true
+         //CURLOPT_RETURNTRANSFER  => true
       ];
       
       /*protected const OPTS_LOCKED = [
