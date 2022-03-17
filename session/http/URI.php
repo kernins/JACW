@@ -48,8 +48,7 @@ class URI
             return $this;
          }
          
-      //TODO: null|string|array type for PHP8+
-      final public function setQuery($query): self
+      final public function setQuery(string|array|null $query): self
          {
             if(empty($query)) $this->query = null;
             else $this->query = is_array($query)? http_build_query($query) : $query;
