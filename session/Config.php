@@ -90,17 +90,15 @@ class Config
          
          }
          
-      public function conTimo(int $timo): self
+      public function conTimo(float $timo): self
          {
-            //TODO: float support?
-            $this->setOpt(CURLOPT_CONNECTTIMEOUT, $timo);
+            $this->setOpt(CURLOPT_CONNECTTIMEOUT_MS, (int)($timo*1000));
             return $this;
          }
          
-      public function sessTimo(int $timo): self
+      public function sessTimo(float $timo): self
          {
-            //TODO: float support?
-            $this->setOpt(CURLOPT_TIMEOUT, $timo);
+            $this->setOpt(CURLOPT_TIMEOUT_MS, (int)($timo*1000));
             return $this;
          }
          

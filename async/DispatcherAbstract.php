@@ -95,7 +95,7 @@ abstract class DispatcherAbstract
                                   */
                                  $wdtNoFDs += static::SELECT_TIMO;
                                  if((static::WDT_NO_FDS>0) && ($wdtNoFDs>=static::WDT_NO_FDS)) throw new exception\WatchdogExpiredException(
-                                    'No FDs to select() on for more than '.$wdtNoFDs.' seconds'
+                                    'No FDs to select() on for more than '.round($wdtNoFDs, 3).' seconds'
                                  );
                                  
                                  usleep((int)(static::SELECT_TIMO-$selTime)*1e6);
@@ -104,7 +104,7 @@ abstract class DispatcherAbstract
                               {
                                  $wdtNoActivity += static::SELECT_TIMO;
                                  if((static::WDT_NO_ACTIVITY>0) && ($wdtNoActivity>=static::WDT_NO_ACTIVITY)) throw new exception\WatchdogExpiredException(
-                                    'No activity on individual transfers for more than '.$wdtNoActivity.' seconds'
+                                    'No activity on individual transfers for more than '. round($wdtNoActivity, 3).' seconds'
                                  );
                               }
                            break;

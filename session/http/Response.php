@@ -16,6 +16,11 @@ Class Response implements session\IResponse
       private array                 $_headersStack = [];
       private cookies\Response      $_cookies;
       
+      /**
+       * Meant to be initialized just-in-time
+       * Indicates actual presence of body in srv response (incompat with CURLOPT_HEADER)
+       * @var body\Response|null
+       */
       protected ?body\Response      $body = null;
       
       
@@ -42,6 +47,10 @@ Class Response implements session\IResponse
          {
             if($this->body === null)
                {
+                  /* NB: There is no guarantee headers will be present at this moment.
+                   * Particulary when CURLOPT_HEADER option is set, headers will be prepended to body
+                   * and so first call of this fn will be at the time first header line is received
+                   */
                   if(!empty($ct=$this->getHeaders()?->getContentTypeAndCharset()))
                      $this->body = body\FactoryResponse::newInstanceForContentType(...$ct);
                   else $this->body = body\FactoryResponse::newInstanceGeneric();
@@ -81,6 +90,17 @@ Class Response implements session\IResponse
                      }*/
                }
             return $this->_cookies;
+         }
+      
+      
+      final public function hasBody(string ...$ofType): bool
+         {
+            if(!empty($this->body))
+               {
+                  foreach($ofType as $t) {if($this->body instanceof $t) return true;}
+                  return empty($ofType); //we still have a valid body if no type constraints specified
+               }
+            return false;
          }
       
       final public function getBody(): ?body\Response

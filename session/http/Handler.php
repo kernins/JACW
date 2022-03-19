@@ -5,20 +5,20 @@ use lib\dp\Curl\session;
 
 class Handler extends session\HandlerAbstract
    {
-      protected Response $response;
+      //protected Response $response;
    
       
       protected function initHandlers(): void
          {
-            $this->response = new Response(new session\InfoProvider($this->hndl));
             curl_setopt($this->hndl, CURLOPT_HEADERFUNCTION, function(\CurlHandle $cHndl, string $line) {
+               if(empty($this->response)) $this->initResponse(); //JIT
+               
                $dLen = strlen($line);
                if(strlen($line=trim($line)) > 0)
                   {
                      $m = null;
                      if(preg_match('/^HTTP\/([\d\.]{1,3})\s+(\d{3})/i', $line, $m))
                         {
-                           //var_dump(curl_getinfo($this->_hndl, CURLINFO_COOKIELIST), curl_getinfo($this->_hndl, CURLINFO_HEADER_OUT));
                            $this->response->appendHeaders(
                               new headers\Response(
                                  new URI(curl_getinfo($this->hndl, CURLINFO_EFFECTIVE_URL)),
@@ -31,6 +31,18 @@ class Handler extends session\HandlerAbstract
                   }
                return $dLen;
             });
+            
+            curl_setopt($this->hndl, CURLOPT_WRITEFUNCTION, function(\CurlHandle $hndl, $chunk){
+               if(empty($this->response)) $this->initResponse(); //JIT
+               
+               $this->getResponse()->appendData($chunk);
+               return strlen($chunk);
+            });
+         }
+         
+      protected function initResponse(): void
+         {
+            $this->response = new Response(new session\InfoProvider($this->hndl));
          }
       
       
@@ -42,12 +54,4 @@ class Handler extends session\HandlerAbstract
             );
             return $this;
          }
-      
-      
-      public function getResponse(): Response
-         {
-            return $this->response;
-         }
-         
-      
    }

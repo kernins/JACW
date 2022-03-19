@@ -9,6 +9,12 @@ abstract class HandlerAbstract
       
       protected Config        $config;
       protected IRequest      $request;
+      /**
+       * Meant to be initialized just-in-time,
+       * indicates presence of actual server response
+       * @var IResponse
+       */
+      protected ?IResponse    $response = null;
    
       
       
@@ -63,29 +69,32 @@ abstract class HandlerAbstract
             $this->hndl = curl_init();
             curl_setopt_array($this->hndl, $this->config->toArray());
             curl_setopt_array($this->hndl, $this->request->toArray());
-            //curl_setopt($this->hndl, CURLOPT_PRIVATE, ['foo'=>'userdata', 'url'=>new http\URI('yandex.net')]);
+            
             $this->initHandlers();
-            
-            curl_setopt($this->hndl, CURLOPT_WRITEFUNCTION, function(\CurlHandle $hndl, $chunk){
-               $this->getResponse()->appendData($chunk);
-               return strlen($chunk);
-            });
-            
             return $this;
          }
          
       abstract protected function initHandlers(): void;
-         
-         
-      public function exec(): self
+      abstract protected function initResponse(): void;
+      
+      
+      public function exec(): static
          {
-            $resp = curl_exec($this->hndl);
+            curl_exec($this->hndl);
             //var_dump(curl_getinfo($this->hndl,  CURLINFO_HEADER_OUT));
             //var_dump(curl_getinfo($this->hndl, CURLINFO_PRIVATE));
             //$this->getResponse()->setData($resp);
             return $this;
          }
+      
          
-      abstract public function getResponse(): IResponse;
+      final public function hasResponse(): bool
+         {
+            return !empty($this->response);
+         }
+         
+      final public function getResponse(): ?IResponse
+         {
+            return $this->response;
+         }
    }
-
