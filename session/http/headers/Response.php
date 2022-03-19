@@ -68,11 +68,23 @@ final class Response extends BaseList
          }
       
       
-      /*public function getRawCookies(): array
+      /**
+       * @return array|null  [string contentType, string|null charset]
+       * @throws exception\UnexpectedValueException
+       */
+      public function getContentTypeAndCharset(): ?array
          {
-            return $this->_cookies;
-         }*/
-         
+            if(!empty($ct=$this->get('Content-Type')))
+               {
+                  $m = null;
+                  if(!preg_match('/^([\w\/\-]+)(?:;\s*charset=([\w\-]+))?(?:;|$)/i', $ct, $m))
+                     throw new exception\UnexpectedValueException('Failed to parse Content-Type: '.$ct);
+                  $ret = [$m[1], $m[2] ?? null];
+               }
+            return $ret ?? null;
+         }
+      
+      
       public function getCookies(): http\cookies\Response
          {
             $cookies = new http\cookies\Response();

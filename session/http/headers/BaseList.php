@@ -26,11 +26,6 @@ abstract class BaseList implements \IteratorAggregate
          {
             return array_key_exists($n=strtolower($name), $this->_list)? $this->_list[$n] : null;
          }
-         
-      public function getContentType(): ?string
-         {
-            return $this->get('Content-Type');
-         }
       
       
       public function getIterator(): \Generator

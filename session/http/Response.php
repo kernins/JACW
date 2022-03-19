@@ -4,7 +4,9 @@ use lib\dp\Curl\session, lib\dp\Curl\exception;
 
 
 Class Response implements session\IResponse
-   {   
+   {
+      private session\InfoProvider  $_infoProvider;
+      
       /**
        * A stack of header lists from all responses in chronological order
        * There could be multiple in case of redirections with follow-location enabled
@@ -14,9 +16,7 @@ Class Response implements session\IResponse
       private array                 $_headersStack = [];
       private cookies\Response      $_cookies;
       
-      protected                     $data = null;
-      
-      private session\InfoProvider  $_infoProvider;
+      protected ?body\Response      $body = null;
       
       
       
@@ -38,42 +38,24 @@ Class Response implements session\IResponse
             return $this;
          }
          
-      public function setData($data): self
+      final public function appendData(string $chunk): self
          {
-            $this->data = $data;
-            return $this;
-         }
-         
-      public function appendData(string $chunk): self
-         {
-            if($this->data === null) $this->data = $chunk;
-            else $this->data .= $chunk;
+            if($this->body === null)
+               {
+                  if(!empty($ct=$this->getHeaders()?->getContentTypeAndCharset()))
+                     $this->body = body\ResponseFactory::newInstanceForContentType(...$ct);
+                  else $this->body = body\ResponseFactory::newInstanceGeneric();
+               }
+            $this->body->appendData($chunk);
             return $this;
          }
       
       
-      public function getStatusCode(): int
+      final public function getStatusCode(): int
          {
             return $this->_infoProvider->get(CURLINFO_RESPONSE_CODE);
          }
-      
-      
-      //TODO: refactor
-      final public function getData()
-         {
-            //TODO: use null-safe for php8
-            if(!empty($data=$this->data) && !empty($hdrs=$this->getHeaders()) && !empty($ct=$hdrs->getContentType()))
-               {
-                  if(strncasecmp($ct, 'application/json', 16) === 0) $data = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
-               }
-            return $data;
-         }
-      
-      final public function getDataRaw(): ?string
-         {
-            return $this->data;
-         }
-         
+
       final public function getHeaders(?int $idx = null): ?headers\Response
          {
             if($idx === null) $idx = count($this->_headersStack) - 1; //returning latest by dflt
@@ -99,5 +81,10 @@ Class Response implements session\IResponse
                      }*/
                }
             return $this->_cookies;
+         }
+      
+      final public function getBody(): ?body\Response
+         {
+            return $this->body;
          }
    }
