@@ -4,21 +4,8 @@ namespace lib\dp\Curl\session\http\body;
 
 class Response implements \Stringable
    {
-      protected string  $raw = '';
-      protected ?string $charset = null;
+      protected string $raw = '';
       
-      
-      
-      final public function __construct(?string $charset=null)
-         {
-            if(!empty($charset)) $this->setCharset($charset);
-         }
-         
-      public function setCharset(string $charset): static
-         {
-            $this->charset = $charset;
-            return $this;
-         }
       
       
       final public function setData(string $data): static
@@ -39,21 +26,36 @@ class Response implements \Stringable
             return !strlen($this->raw);
          }
       
+      /**
+       * Returns raw data as-received
+       * @return string
+       */
       final public function getDataRaw(): string
          {
             return $this->raw;
          }
-         
+      
+      /**
+       * Returns (potentially filtered/decoded/preprocessed) data as string
+       * @return string
+       */
+      public function getDataString(): string
+         {
+            return $this->getDataRaw();
+         }
+      
+      /**
+       * Returns data as appropriate type
+       * @return mixed
+       */
       public function getData()
          {
-            return $this->__toString();
+            return $this->getDataString();
          }
       
       
       final public function __toString(): string
          {
-            return !empty($this->charset) && (strcasecmp($this->charset, 'utf8')!==0)?
-               mb_convert_encoding($this->getDataRaw(), 'utf8', $this->charset) :
-               $this->getDataRaw();
+            return $this->getDataString();
          }
    }

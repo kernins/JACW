@@ -43,8 +43,8 @@ Class Response implements session\IResponse
             if($this->body === null)
                {
                   if(!empty($ct=$this->getHeaders()?->getContentTypeAndCharset()))
-                     $this->body = body\ResponseFactory::newInstanceForContentType(...$ct);
-                  else $this->body = body\ResponseFactory::newInstanceGeneric();
+                     $this->body = body\FactoryResponse::newInstanceForContentType(...$ct);
+                  else $this->body = body\FactoryResponse::newInstanceGeneric();
                }
             $this->body->appendData($chunk);
             return $this;
