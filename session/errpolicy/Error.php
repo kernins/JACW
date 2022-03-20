@@ -8,19 +8,18 @@ namespace lib\dp\Curl\session\errpolicy;
  */
 final class Error
    {
-      private int    $_code;
       private string $_message;
+      private int    $_code;
       
       private string $_throwableFQN;
-      
       private int    $_retriesAllowed;
       
       
       
-      public function __construct(int $code, string $message, string $throwableFQN, int $retriesAllowed=0)
+      public function __construct(string $message, int $code, string $throwableFQN, int $retriesAllowed=0)
          {
-            $this->_code = $code;
             $this->_message = $message;
+            $this->_code = $code;
             
             $this->_throwableFQN = $throwableFQN;
             $this->_retriesAllowed = $retriesAllowed;
