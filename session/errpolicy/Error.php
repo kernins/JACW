@@ -32,8 +32,9 @@ final class Error
             return ($attempt <= $this->_retriesAllowed);
          }
       
-      public function getThrowable(): \Throwable
+      
+      public function throw(): void //TODO: void->never for php 8.1+
          {
-            return new $this->_throwableFQN($this->_message, $this->_code);
+            throw new $this->_throwableFQN($this->_message, $this->_code);
          }
    }

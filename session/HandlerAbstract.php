@@ -120,23 +120,40 @@ abstract class HandlerAbstract
          }
       
       
-      final public function exec(bool $skipErrorChecking=false): static
+      final public function execSimple(): static
          {
             if($this->hasResponse()) throw new exception\BadMethodCallException(
                'Existing session must be re-initialized before calling '.__METHOD__.'() again'
             );
-         
+            
             curl_exec($this->hndl);
-            if(!$skipErrorChecking && !empty($err=$this->checkError()))
+            return $this;
+         }
+         
+      final public function execSmart(): static
+         {
+            if(empty($this->errorPolicy)) throw new exception\BadMethodCallException(
+               __METHOD__.'() requires an ErrorPolicy to be set'
+            );
+            
+            $retryAttempt = 0;
+            do
                {
-                  throw $err->getThrowable();
+                  if($retryAttempt > 0)
+                     $this->reset()->init();
+                  
+                  $this->execSimple();
+                  $err = $this->checkError();
                }
+            while(!empty($err) && $err->isRetryable(++$retryAttempt));
+            $err?->throw();
+            
             return $this;
          }
       
       public function checkError(): ?errpolicy\Error
          {
-            return $this->errorPolicy?->evaluate($this->infoProvider);
+            return $this->errorPolicy?->evaluate($this->infoProvider, $this->hasResponse());
          }
       
       

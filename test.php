@@ -13,6 +13,7 @@ $req->postRawJSON(['foo'=>'bar', 'baz'=>'kek']);
 //$req->setAuth('Basic', 'user', 'passwd');
 $req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('https://google.ru'));
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://srvweb.com/err500.php'));
+$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://172.30.200.10'));
 $cfg = new \lib\dp\Curl\session\http\Config();
 //$cfg->returnTransfer(false);
 
@@ -68,7 +69,10 @@ $cfg->setOpt(CURLINFO_HEADER_OUT, true);
 $cfg->conTimo(5)->sessTimo(15);
 
 $sess=new \lib\dp\Curl\session\http\Handler($req, $cfg);
-$resp=$sess->init()->exec()->getResponse();
+$sess->setErrorPolicy(new lib\dp\Curl\session\http\ErrorPolicy(1, true));
+$sess->init()->execSmart();
+//$sess->init()->execSimple();
+$resp=$sess->getResponse();
 //$resp2=$sess->exec();
 //$resp2=$sess->testChgUri('https://yandex.ru')->exec();
 

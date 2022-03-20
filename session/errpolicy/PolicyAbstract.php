@@ -5,6 +5,8 @@ use lib\dp\Curl\session, lib\dp\Curl\exception;
 
 abstract class PolicyAbstract
    {
+      protected const NORESPONSE_ERROR    =  exception\transfer\ServerErrorException::class;
+   
       protected const CURL_ERROR_DEFAULT  =  exception\transfer\CurlErrorException::class;
    
       protected const CURL_ERRORS_MAP = [
@@ -20,29 +22,35 @@ abstract class PolicyAbstract
       ];
       
       
-      protected int $maxRetriesAllowed;
+      protected int  $maxRetriesAllowed;
+      protected bool $responseRequired;
       
       
       
-      public function __construct(int $maxRetries=0)
+      public function __construct(int $maxRetries=0, bool $responseRequired=true)
          {
             $this->maxRetriesAllowed = $maxRetries;
+            $this->responseRequired = $responseRequired;
          }
       
       
-      
-      final public function evaluate(session\InfoProvider $sessIP): ?Error
+      final public function evaluate(session\InfoProvider $sessIP, bool $hasSrvResponse): ?Error
          {
             //trying responseCode first as it is proto-specific and can produce more specific/narrow error-info
             if(empty($err=$this->evaluateResponseCode($sessIP->getInfoRespCode())) && $sessIP->hasPendingError())
                {
                   //evaluating libcurl error
                   $errCode = $sessIP->getLastErrorCode();
-                  if(!empty($ec=$this->getKnownErrorCaseForCode($errCode)))
-                     $err = new Error($errCode, $sessIP->getLastErrorMessage(), static::CURL_ERRORS_MAP[$ec::class], $this->getMaxRetriesAllowedForError($ec));
+                  if(!empty($ec=$this->getKnownCurlErrorCaseForCode($errCode)))
+                     $err = new Error($errCode, $sessIP->getLastErrorMessage(), static::CURL_ERRORS_MAP[$ec::class], $this->getRetriesLimitForCurlError($ec));
                   elseif(!empty(static::CURL_ERROR_DEFAULT))
                      $err = new Error($errCode, $sessIP->getLastErrorMessage(), static::CURL_ERROR_DEFAULT);
                }
+            
+            //least informative case, trying last
+            if(empty($err) && !$hasSrvResponse && $this->responseRequired)
+               $err = new Error($sessIP->getInfoRespCode(), 'No response from server', static::NORESPONSE_ERROR, $this->getRetriesLimitForNoRespError());
+            
             return $err;
          }
       
@@ -56,7 +64,7 @@ abstract class PolicyAbstract
       abstract protected function evaluateResponseCode(int $respCode): ?Error;
       
       
-      protected function getKnownErrorCaseForCode(int $code): ?ICurlErrorCase
+      protected function getKnownCurlErrorCaseForCode(int $code): ?ICurlErrorCase
          {
             $case = null;
             foreach(array_keys(static::CURL_ERRORS_MAP) as $enum)
@@ -67,8 +75,13 @@ abstract class PolicyAbstract
             return $case;
          }
          
-      protected function getMaxRetriesAllowedForError(ICurlErrorCase $err): int
+      protected function getRetriesLimitForCurlError(ICurlErrorCase $err): int
          {
             return in_array($err::class, static::CURL_ERRORS_RETRYABLE)? $this->maxRetriesAllowed : 0;
+         }
+         
+      protected function getRetriesLimitForNoRespError(): int
+         {
+            return $this->maxRetriesAllowed;
          }
    }
