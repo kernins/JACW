@@ -6,6 +6,7 @@ use lib\dp\Curl\exception;
 abstract class HandlerAbstract
    {
       protected \CurlHandle   $hndl;
+      protected InfoProvider  $infoProvider;
       
       protected Config        $config;
       protected IRequest      $request;
@@ -15,7 +16,9 @@ abstract class HandlerAbstract
        * @var IResponse
        */
       protected ?IResponse    $response = null;
-   
+      
+      protected ?errpolicy\PolicyAbstract $errorPolicy = null;
+      
       
       
       public function __construct(?IRequest $request=null, ?Config $config = null)
@@ -40,6 +43,12 @@ abstract class HandlerAbstract
          {
             if(empty($this->config)) $this->config = $cfg; //TODO: clone?
             else $this->config->merge($cfg);
+            return $this;
+         }
+         
+      public function setErrorPolicy(errpolicy\PolicyAbstract $errPol): self
+         {
+            $this->errorPolicy = $errPol;
             return $this;
          }
       
@@ -67,6 +76,8 @@ abstract class HandlerAbstract
       final public function init(): self
          {
             $this->hndl = curl_init();
+            $this->infoProvider = new InfoProvider($this->hndl);
+            
             curl_setopt_array($this->hndl, $this->config->toArray());
             curl_setopt_array($this->hndl, $this->request->toArray());
             
@@ -78,13 +89,19 @@ abstract class HandlerAbstract
       abstract protected function initResponse(): void;
       
       
-      public function exec(): static
+      public function exec(bool $skipErrorChecking=false): static
          {
             curl_exec($this->hndl);
-            //var_dump(curl_getinfo($this->hndl,  CURLINFO_HEADER_OUT));
-            //var_dump(curl_getinfo($this->hndl, CURLINFO_PRIVATE));
-            //$this->getResponse()->setData($resp);
+            if(!$skipErrorChecking && !empty($err=$this->checkError()))
+               {
+                  throw $err->getThrowable();
+               }
             return $this;
+         }
+         
+      public function checkError(): ?errpolicy\Error
+         {
+            return $this->errorPolicy?->evaluate($this->infoProvider);
          }
       
          

@@ -62,7 +62,7 @@ Class Response implements session\IResponse
       
       final public function getStatusCode(): int
          {
-            return $this->_infoProvider->get(CURLINFO_RESPONSE_CODE);
+            return $this->_infoProvider->getInfoRespCode();
          }
 
       final public function getHeaders(?int $idx = null): ?headers\Response

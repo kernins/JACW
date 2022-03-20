@@ -38,11 +38,14 @@ class Handler extends session\HandlerAbstract
                $this->getResponse()->appendData($chunk);
                return strlen($chunk);
             });
+            
+            //TODO: refactor init* methods
+            if(empty($this->errorPolicy)) $this->errorPolicy = new ErrorPolicy(); //default policy
          }
          
       protected function initResponse(): void
          {
-            $this->response = new Response(new session\InfoProvider($this->hndl));
+            $this->response = new Response($this->infoProvider);
          }
       
       
