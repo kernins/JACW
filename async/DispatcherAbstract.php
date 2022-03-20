@@ -124,9 +124,8 @@ abstract class DispatcherAbstract
             if((count($this->transActive)<$this->maxActive) && !$this->transPending->isEmpty())
                {
                   $trans = $this->transPending->dequeue();
-                  if(!$trans->isInitialized()) $trans->init();
+                  $hndl = $trans->init()->getHandle();
                   
-                  $hndl = $trans->getHandle();
                   if(isset($this->transActive[(int)$hndl]))
                      throw new exception\LogicException('Curl session#'.(int)$hndl.' is already in stack');
                   if(($res=curl_multi_add_handle($this->_hndl, $hndl)) !== CURLM_OK)
