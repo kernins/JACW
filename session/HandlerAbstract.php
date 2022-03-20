@@ -13,7 +13,7 @@ abstract class HandlerAbstract
       
       /**
        * Meant to be initialized just-in-time (on getting actual server response),
-       * and so indicates presence of such response
+       * and so indicates presence of such a response
        * @var IResponse
        */
       protected ?IResponse    $response = null;
@@ -65,37 +65,52 @@ abstract class HandlerAbstract
          }
       
       
-      public function getConfig(): Config
-         {
-            return $this->config;
-         }
-      
       /**
-       * This is primarily for Curl-Multi
+       * Is here primarily for CurlMulti / AsyncDispatcher
        * @return \CurlHandle
        */
-      public function getHandle(): \CurlHandle
+      final public function getHandle(): \CurlHandle
          {
             return $this->hndl;
          }
       
-         
-      final public function init(): static
+      public function getConfig(): Config
+         {
+            if(empty($this->config)) throw new exception\BadMethodCallException(
+               __METHOD__.'() must not be called before Config is set'
+            );
+            return $this->config;
+         }
+      
+      public function getResponse(): ?IResponse
+         {
+            return $this->response;
+         }
+      
+      final public function hasResponse(): bool
+         {
+            return !empty($this->response);
+         }
+      
+      
+      public function init(): static
          {
             if(empty($this->request) || empty($this->config)) throw new exception\BadMethodCallException(
                'Request and Config must both be set before calling '.__METHOD__.'()'
             );
-            if(!empty($this->response)) throw new exception\BadMethodCallException(
+            if($this->hasResponse()) throw new exception\BadMethodCallException(
                'Existing session must be reset before calling '.__METHOD__.'() again'
             );
-         
-            curl_setopt_array($this->hndl, $this->config->toArray());
-            curl_setopt_array($this->hndl, $this->request->toArray());
             
-            $this->initHandlers();
+            $this->setOptsGroup($this->config->toArray());
+            $this->setOptsGroup($this->request->toArray());
+            
+            //FIXME: use first class callable syntax, php 8.1+
+            //Using class method to allow overrides
+            $this->setOpt(CURLOPT_WRITEFUNCTION, [$this, 'cbBodyWriter']);
+            
             return $this;
          }
-      abstract protected function initHandlers(): void;
       
       final public function reset(): static
          {
@@ -107,7 +122,7 @@ abstract class HandlerAbstract
       
       final public function exec(bool $skipErrorChecking=false): static
          {
-            if(!empty($this->response)) throw new exception\BadMethodCallException(
+            if($this->hasResponse()) throw new exception\BadMethodCallException(
                'Existing session must be re-initialized before calling '.__METHOD__.'() again'
             );
          
@@ -118,20 +133,42 @@ abstract class HandlerAbstract
                }
             return $this;
          }
-         
+      
       public function checkError(): ?errpolicy\Error
          {
             return $this->errorPolicy?->evaluate($this->infoProvider);
          }
       
       
-      final public function hasResponse(): bool
+      final protected function setOpt(int $opt, $val): void
          {
-            return !empty($this->response);
+            if(!curl_setopt($this->hndl, $opt, $val)) throw new exception\RuntimeException(
+               'Failed to set curl option['.$opt.']: '.$this->infoProvider->getLastErrorCode().': '.$this->infoProvider->getLastErrorMessage()
+            );
          }
-         
-      final public function getResponse(): ?IResponse
+      
+      final protected function setOptsGroup(array $opts): void
          {
-            return $this->response;
+            if(!curl_setopt_array($this->hndl, $opts)) throw new exception\RuntimeException(
+               'Failed to set options group: '.$this->infoProvider->getLastErrorCode().': '.$this->infoProvider->getLastErrorMessage()
+            );
          }
+      
+      
+      /**
+       * CURLOPT_WRITEFUNCTION callback
+       * 
+       * @param \CurlHandle   $hndl
+       * @param string        $chunk
+       * @return int
+       */
+      protected function cbBodyWriter(\CurlHandle $hndl, string $chunk): int
+         {
+            if(!$this->hasResponse()) $this->initResponse(); //JIT
+            
+            $this->getResponse()->appendData($chunk);
+            return strlen($chunk);
+         }
+      
+      abstract protected function initResponse(): void;
    }

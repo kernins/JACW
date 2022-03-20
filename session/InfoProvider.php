@@ -23,6 +23,15 @@ final class InfoProvider
          {
             return $this->getInfo(CURLINFO_RESPONSE_CODE);
          }
+         
+      /**
+       * Will track redirects when FOLLOWLOCATION enabled
+       * @return string    URL of current request
+       */
+      public function getInfoEffectiveURL(): string
+         {
+            return $this->getInfo(CURLINFO_EFFECTIVE_URL);
+         }
       
       
       public function getLastCurlCode(): int
