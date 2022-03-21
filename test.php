@@ -6,14 +6,16 @@ $loader->registerNamespacePath('lib\dp\Curl', __DIR__)->register();
 
 
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://srvweb.com/redirwithcook.php'));
-$req = new \lib\dp\Curl\session\http\request\POST(new \lib\dp\Curl\session\http\URI('http://srvweb.com/json.php'));
-$req->postFormWwwUrlencoded('foo=bar&baz=kek');
-$req->postMultipartFormData(['foo'=>'bar', 'baz'=>'kek']);
-$req->postRawJSON(['foo'=>'bar', 'baz'=>'kek']);
+$req = new \lib\dp\Curl\session\http\request\POST(new \lib\dp\Curl\session\http\URI('http://srvweb.com/dump.php'));
+$req->setFormdataUrlencoded('foo=bar&baz=kek');
+$req->setFormdataMultipart(['foo'=>'bar', 'baz'=>'kek']);
+$req->setBody(
+   new \lib\dp\Curl\session\http\body\request\ApplicationJson(['foo'=>'bar', 'baz'=>'kek'])
+);
 //$req->setAuth('Basic', 'user', 'passwd');
-$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('https://google.ru'));
+//$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('https://google.ru'));
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://srvweb.com/err500.php'));
-$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://172.30.200.10'));
+//$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://172.30.200.10'));
 $cfg = new \lib\dp\Curl\session\http\Config();
 //$cfg->returnTransfer(false);
 

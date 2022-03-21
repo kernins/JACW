@@ -9,33 +9,27 @@ class POST extends http\Request
          {
             parent::__construct($url, 'POST');
          }
-         
-         
-      //FIXME: refactor all post* methods, don't use $this->opts
-      public function postFormWwwUrlencoded($data): self //TODO: string|array typehind for php8
+      
+      
+      //FIXME: refactor all set* methods, don't use $this->opts, merge into single method?
+      public function setFormdataUrlencoded(string|array $data): self
          {
             $this->opts[CURLOPT_POSTFIELDS] = is_array($data)? http_build_query($data) : $data;
             return $this;
          }
-         
-      public function postMultipartFormData(array $data): self
+      
+      public function setFormdataMultipart(array $data): self
          {
             $this->opts[CURLOPT_POSTFIELDS] = $data;
             return $this;
          }
-         
-      //FIXME: ...and especially this one
-      public function postRaw(string $data, string $contentType): self
+      
+      public function setBody(http\body\Request $body): self
          {
-            $this->opts[CURLOPT_POSTFIELDS] = $data;
+            $this->opts[CURLOPT_POSTFIELDS] = (string)$body;
             $this->addHeaders(
-               (new http\headers\Request())->set('Content-Type', $contentType)
+               (new http\headers\Request())->set('Content-Type', $body->getContentType())
             );
             return $this;
-         }
-         
-      public function postRawJSON($data): self
-         {
-            return $this->postRaw(json_encode($data), 'application/json');
          }
    }
