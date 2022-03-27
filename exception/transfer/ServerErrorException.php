@@ -3,7 +3,7 @@ namespace lib\dp\Curl\exception\transfer;
 use lib\dp\Curl\exception;
 
 
-class ServerErrorException extends exception\RuntimeException
+class ServerErrorException extends exception\RuntimeException implements exception\ITransferFailedException
    {
       
    }

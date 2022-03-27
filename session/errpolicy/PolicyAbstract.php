@@ -28,10 +28,10 @@ abstract class PolicyAbstract
       
       
       
-      public function __construct(int $maxRetries=0, bool $responseRequired=true)
+      public function __construct(int $maxRetries=0, bool $respRequired=true)
          {
             $this->maxRetriesAllowed = $maxRetries;
-            $this->responseRequired = $responseRequired;
+            $this->responseRequired = $respRequired;
          }
       
       

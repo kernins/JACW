@@ -136,6 +136,7 @@ abstract class HandlerAbstract
                __METHOD__.'() requires an ErrorPolicy to be set'
             );
             
+            $this->init();
             $retryAttempt = 0;
             do
                {
