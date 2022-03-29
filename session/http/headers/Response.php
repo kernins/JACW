@@ -32,14 +32,18 @@ final class Response extends BaseList
             if(!strlen($hdrLine=trim($hdrLine))) throw new exception\UnexpectedValueException('Empty header line given');
             
             $m = null;
-            if(!preg_match('/^([-\w.]+):\s*(.+)$/i', $hdrLine, $m)) throw new exception\UnexpectedValueException('Malformed header line given ['.$hdrLine.']');
+            /* Allow empty headers (Header-Name: *nothing*), some broken servers may send them
+             * Seen on Lightspeed API (oAuth flow, "Cookie:" header line)
+             */
+            if(!preg_match('/^([-\w.]+):\s*(.*)$/i', $hdrLine, $m))
+               throw new exception\UnexpectedValueException('Malformed header line given ['.$hdrLine.']');
             
             return $this->set($m[1], $m[2]);
          }
          
       public function set(string $name, string $value): self
          {
-            if(strcasecmp($name, 'Set-Cookie') === 0) $this->_cookies[] = $value;
+            if((strcasecmp($name, 'Set-Cookie')===0) && strlen($value)) $this->_cookies[] = $value;
             else parent::set($name, $value);
             return $this;
          }

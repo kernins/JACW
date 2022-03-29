@@ -18,6 +18,13 @@ final class Request extends BaseList
          }
       
       
+      public function set(string $name, string $value): self
+         {
+            if(!strlen($value)) throw new exception\UnexpectedValueException('Empty value given for header '.$name);
+            return parent::set($name, $value);
+         }
+      
+      
       public function toArray(): array
          {
             $arr = [];

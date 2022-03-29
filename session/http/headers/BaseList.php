@@ -1,5 +1,6 @@
 <?php
 namespace lib\dp\Curl\session\http\headers;
+use lib\dp\Curl\exception;
 
 
 abstract class BaseList implements \IteratorAggregate
@@ -9,6 +10,9 @@ abstract class BaseList implements \IteratorAggregate
       
       public function set(string $name, string $value): self
          {
+            if(!strlen($name)) throw new exception\UnexpectedValueException('Header name can not be empty');
+            //allow empty value, some broken servers may send such a headers
+            
             //FIXME: remove strtolower() normalization from here
             //Request headers should retain their Canonical-Form
             $this->_list[strtolower($name)] = $value;
