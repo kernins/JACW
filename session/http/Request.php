@@ -56,25 +56,25 @@ class Request implements IRequest
       
       public function toArray(): array
          {
-            $opts = [CURLOPT_URL => (string)$this->url];
+            $opts = [\CURLOPT_URL => (string)$this->url];
             
             //using dedicated opt for method (when available)
             //to ensure libcurl's internal consistency
             if(strcasecmp($this->method, 'GET') === 0)
                {
-                  $opts[CURLOPT_HTTPGET] = true;
+                  $opts[\CURLOPT_HTTPGET] = true;
                }
             elseif(strcasecmp($this->method, 'POST') === 0)
                {
-                  $opts[CURLOPT_POST] = true;
+                  $opts[\CURLOPT_POST] = true;
                }
             elseif(strcasecmp($this->method, 'HEAD') === 0)
                {
-                  $opts[CURLOPT_NOBODY] = true;
+                  $opts[\CURLOPT_NOBODY] = true;
                }
-            else $opts[CURLOPT_CUSTOMREQUEST] = $this->method;
+            else $opts[\CURLOPT_CUSTOMREQUEST] = $this->method;
             
-            if(!empty($this->headers)) $opts[CURLOPT_HTTPHEADER] = $this->headers->toArray();
+            if(!empty($this->headers)) $opts[\CURLOPT_HTTPHEADER] = $this->headers->toArray();
             
             return $opts + $this->opts;
          }

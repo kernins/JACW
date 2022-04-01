@@ -21,7 +21,7 @@ final class InfoProvider
       
       public function getInfoRespCode(): int
          {
-            return $this->getInfo(CURLINFO_RESPONSE_CODE);
+            return $this->getInfo(\CURLINFO_RESPONSE_CODE);
          }
          
       /**
@@ -30,7 +30,7 @@ final class InfoProvider
        */
       public function getInfoEffectiveURL(): string
          {
-            return $this->getInfo(CURLINFO_EFFECTIVE_URL);
+            return $this->getInfo(\CURLINFO_EFFECTIVE_URL);
          }
       
       
@@ -41,7 +41,7 @@ final class InfoProvider
       
       public function hasPendingError(): bool
          {
-            return ($this->getLastCurlCode() != CURLE_OK);
+            return ($this->getLastCurlCode() != \CURLE_OK);
          }
       
       public function getLastErrorCode(): ?int

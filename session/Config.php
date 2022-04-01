@@ -77,7 +77,7 @@ class Config
       
       public function returnTransfer(bool $val): self
          {
-            return $this->setOpt(CURLOPT_RETURNTRANSFER, $val);
+            return $this->setOpt(\CURLOPT_RETURNTRANSFER, $val);
          }
          
       public function dlIntoFile(): self
@@ -92,13 +92,13 @@ class Config
          
       public function conTimo(float $timo): self
          {
-            $this->setOpt(CURLOPT_CONNECTTIMEOUT_MS, (int)($timo*1000));
+            $this->setOpt(\CURLOPT_CONNECTTIMEOUT_MS, (int)($timo*1000));
             return $this;
          }
          
       public function sessTimo(float $timo): self
          {
-            $this->setOpt(CURLOPT_TIMEOUT_MS, (int)($timo*1000));
+            $this->setOpt(\CURLOPT_TIMEOUT_MS, (int)($timo*1000));
             return $this;
          }
          

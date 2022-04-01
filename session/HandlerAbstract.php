@@ -107,7 +107,7 @@ abstract class HandlerAbstract
             
             //FIXME: use first class callable syntax, php 8.1+
             //Using class method to allow overrides
-            $this->setOpt(CURLOPT_WRITEFUNCTION, [$this, 'cbBodyWriter']);
+            $this->setOpt(\CURLOPT_WRITEFUNCTION, [$this, 'cbBodyWriter']);
             
             return $this;
          }

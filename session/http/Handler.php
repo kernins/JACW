@@ -30,7 +30,7 @@ class Handler extends session\HandlerAbstract
          {
             parent::init();
             
-            $this->setOpt(CURLOPT_HEADERFUNCTION, function(\CurlHandle $cHndl, string $line) {
+            $this->setOpt(\CURLOPT_HEADERFUNCTION, function(\CurlHandle $cHndl, string $line) {
                $wLen = strlen($line); //orig data len
                if(strlen($line=trim($line)) > 0)
                   {

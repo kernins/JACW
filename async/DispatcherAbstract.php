@@ -128,7 +128,7 @@ abstract class DispatcherAbstract
                   
                   if(isset($this->transActive[(int)$hndl]))
                      throw new exception\LogicException('Curl session#'.(int)$hndl.' is already in stack');
-                  if(($res=curl_multi_add_handle($this->_hndl, $hndl)) !== CURLM_OK)
+                  if(($res=curl_multi_add_handle($this->_hndl, $hndl)) !== \CURLM_OK)
                      throw new exception\RuntimeException('Failed to add curl session#'.(int)$hndl.' into stack', $res);
 
                   $this->transActive[(int)$hndl] = $trans;
@@ -161,7 +161,7 @@ abstract class DispatcherAbstract
              */
          
             //NB: CURLM_CALL_MULTI_PERFORM is gone since long ago (libcurl 7.20.0+)
-            if(($res=curl_multi_exec($this->_hndl, $this->_numRunningTransfers)) !== CURLM_OK)
+            if(($res=curl_multi_exec($this->_hndl, $this->_numRunningTransfers)) !== \CURLM_OK)
                throw new exception\RuntimeException('curl_multi_exec() failed', $res);
          }
          
@@ -176,7 +176,7 @@ abstract class DispatcherAbstract
              */
             while(!empty($info=curl_multi_info_read($this->_hndl)))
                {
-                  if($info['msg'] != CURLMSG_DONE) throw new exception\LogicException(
+                  if($info['msg'] != \CURLMSG_DONE) throw new exception\LogicException(
                      'Unknown CurlMulti info message type: '.$info['msg']
                   );
                   
@@ -185,7 +185,7 @@ abstract class DispatcherAbstract
                   $trans = $this->transActive[$transID];
                   unset($this->transActive[$transID]);
                   
-                  if(($res=curl_multi_remove_handle($this->_hndl, $trans->getHandle())) != CURLM_OK)
+                  if(($res=curl_multi_remove_handle($this->_hndl, $trans->getHandle())) != \CURLM_OK)
                      throw new exception\RuntimeException('Failed to remove session #'.$transID.' handle', $res);
                   
                   //TODO: basic rety logic based on 'result'

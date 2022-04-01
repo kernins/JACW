@@ -21,9 +21,9 @@ class Basic implements IAuth
       public function toArray(): array
          {
             return [
-               CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-               CURLOPT_USERNAME => $this->username,
-               CURLOPT_PASSWORD => $this->password
+               \CURLOPT_HTTPAUTH => \CURLAUTH_BASIC,
+               \CURLOPT_USERNAME => $this->username,
+               \CURLOPT_PASSWORD => $this->password
             ];
          }
    }

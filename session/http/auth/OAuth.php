@@ -18,8 +18,8 @@ class OAuth implements IAuth
       public function toArray(): array
          {      
             return [
-               CURLOPT_HTTPAUTH        => CURLAUTH_BEARER,
-               CURLOPT_XOAUTH2_BEARER  => $this->token
+               \CURLOPT_HTTPAUTH        => \CURLAUTH_BEARER,
+               \CURLOPT_XOAUTH2_BEARER  => $this->token
             ];
          }
    }
