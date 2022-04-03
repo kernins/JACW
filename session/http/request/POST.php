@@ -11,24 +11,27 @@ class POST extends http\Request
          }
       
       
-      //FIXME: refactor all set* methods, don't use $this->opts, merge into single method?
-      public function setFormdataUrlencoded(string|array $data): self
+      
+      public function setBody(http\body\RequestForm|http\body\RequestContent $body): self
          {
-            $this->opts[\CURLOPT_POSTFIELDS] = is_array($data)? http_build_query($data) : $data;
+            $body instanceof http\body\RequestForm?
+               $this->setBodyFormData($body) :
+               $this->setBodyContent($body);
+
             return $this;
          }
-      
-      public function setFormdataMultipart(array $data): self
+         
+      protected function setBodyFormData(http\body\RequestForm $body): self
          {
-            $this->opts[\CURLOPT_POSTFIELDS] = $data;
+            $this->opts[\CURLOPT_POSTFIELDS] = $body->getPostableData();
             return $this;
          }
-      
-      public function setBody(http\body\Request $body): self
+         
+      protected function setBodyContent(http\body\RequestContent $body): self
          {
-            $this->opts[\CURLOPT_POSTFIELDS] = (string)$body;
+            $this->opts[\CURLOPT_POSTFIELDS] = $body->getPostableContent();
             $this->addHeaders(
-               (new http\headers\Request())->set('Content-Type', $body->getContentType())
+               new http\headers\Request(['Content-Type' => $body->getContentType()])
             );
             return $this;
          }

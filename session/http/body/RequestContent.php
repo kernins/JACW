@@ -2,7 +2,7 @@
 namespace lib\dp\Curl\session\http\body;
 
 
-class Request implements \Stringable
+class RequestContent
    {
       protected string  $contentType;
       protected string  $rawData;
@@ -16,13 +16,13 @@ class Request implements \Stringable
          }
       
       
+      
       public function getContentType(): string
          {
             return $this->contentType;
          }
-      
-      
-      public function __toString(): string
+         
+      public function getPostableContent(): string
          {
             return $this->rawData;
          }

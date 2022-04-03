@@ -1,9 +1,9 @@
 <?php
 namespace lib\dp\Curl\session\http\body\request;
-use lib\dp\Curl\session\http\body\Request as RequestBase;
+use lib\dp\Curl\session\http\body;
 
 
-class ApplicationJson extends RequestBase
+class ApplicationJson extends body\RequestContent
    {
       public function __construct($data)
          {
