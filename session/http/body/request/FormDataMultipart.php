@@ -3,11 +3,11 @@ namespace lib\dp\Curl\session\http\body\request;
 use lib\dp\Curl\session\http\body;
 
 
-class FormDataMultipart extends body\RequestForm
+final class FormDataMultipart extends body\RequestForm
    {
-      final public function getPostableData(): array
+      public function getFormData(): array
          {
-            return parent::getPostableData();
+            return parent::getFormData();
          }
    }
 

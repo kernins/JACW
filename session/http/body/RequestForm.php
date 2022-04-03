@@ -8,6 +8,7 @@ class RequestForm
       protected array $data;
       
       
+      
       public function __construct(array $data)
          {
             if(empty($data)) throw new exception\UnexpectedValueException('No form data given');
@@ -15,8 +16,7 @@ class RequestForm
          }
       
       
-      
-      public function getPostableData(): string|array
+      public function getFormData(): string|array
          {
             return $this->data;
          }

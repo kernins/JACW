@@ -12,24 +12,24 @@ class POST extends http\Request
       
       
       
-      public function setBody(http\body\RequestForm|http\body\RequestContent $body): self
+      public function setBody(http\body\RequestForm|http\body\RequestRaw $body): self
          {
             $body instanceof http\body\RequestForm?
                $this->setBodyFormData($body) :
-               $this->setBodyContent($body);
+               $this->setBodyRawContent($body);
 
             return $this;
          }
          
       protected function setBodyFormData(http\body\RequestForm $body): self
          {
-            $this->opts[\CURLOPT_POSTFIELDS] = $body->getPostableData();
+            $this->opts[\CURLOPT_POSTFIELDS] = $body->getFormData();
             return $this;
          }
          
-      protected function setBodyContent(http\body\RequestContent $body): self
+      protected function setBodyRawContent(http\body\RequestRaw $body): self
          {
-            $this->opts[\CURLOPT_POSTFIELDS] = $body->getPostableContent();
+            $this->opts[\CURLOPT_POSTFIELDS] = $body->getContent();
             $this->addHeaders(
                new http\headers\Request(['Content-Type' => $body->getContentType()])
             );

@@ -8,7 +8,7 @@ $loader->registerNamespacePath('lib\dp\Curl', __DIR__)->register();
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://srvweb.com/redirwithcook.php'));
 $req = new \lib\dp\Curl\session\http\request\POST(new \lib\dp\Curl\session\http\URI('http://srvweb.com/dump.php'));
 $req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataUrlencoded(['foo'=>'bar', 'baz'=>'kek-кириллица']));
-$req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataMultipart(['foo'=>'bar', 'baz'=>'kek-кириллица']));
+//$req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataMultipart(['foo'=>'bar', 'baz'=>'kek-кириллица']));
 $req->setBody(new \lib\dp\Curl\session\http\body\request\ApplicationJson(['foo'=>'bar', 'baz'=>'kek-кириллица']));
 //$req->setAuth('Basic', 'user', 'passwd');
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('https://google.ru'));
