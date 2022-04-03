@@ -6,17 +6,20 @@ use lib\dp\Curl\exception, lib\dp\Curl\session\IRequest;
 class Request implements IRequest
    {
       protected URI              $url;
-      protected string           $method = 'GET';
+      protected string           $method;
       protected headers\Request  $headers;
       
       //TODO: remove? or replace with base Config inst?
       protected array            $opts = [];
       
       
-      public function __construct(URI $url, ?string $method=null)
+      public function __construct(URI $url, string $method='GET')
          {
+            //TODO: replace string with enum?
+            if(!strlen($method)) throw new exception\UnexpectedValueException('No request method (verb) specified');
+         
             $this->url = $url;
-            if(!empty($method)) $this->method = $method;
+            $this->method = $method;
             //TODO: method validation and normalization
             //TODO: switch to php 8.1 Enum later
          }
@@ -39,7 +42,19 @@ class Request implements IRequest
       public function setAuth(IAuth $auth): self
          {
             //TODO: refactor, don't use opts?
-            $this->opts = $auth->toArray() + $this->opts;
+            $this->mergeOpts($auth->toArray());
+            return $this;
+         }
+         
+      protected function mergeOpts(array $opts): static
+         {
+            $this->opts = $opts + $this->opts;
+            return $this;
+         }
+         
+      protected function setOpt(int $opt, $value): static
+         {
+            $this->opts[$opt] = $value;
             return $this;
          }
       
