@@ -2,7 +2,7 @@
 namespace lib\dp\Curl\session\http\request;
 
 
-class GET extends TypedAbstract
+class HEAD extends TypedAbstract
    {
    
    }

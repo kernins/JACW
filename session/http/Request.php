@@ -13,7 +13,7 @@ class Request implements IRequest
       protected array            $opts = [];
       
       
-      public function __construct(URI $url, string $method='GET')
+      public function __construct(URI $url, string $method)
          {
             //TODO: replace string with enum?
             if(!strlen($method)) throw new exception\UnexpectedValueException('No request method (verb) specified');
@@ -25,13 +25,13 @@ class Request implements IRequest
          }
       
       
-      public function setHeaders(headers\Request $headers): self
+      public function setHeaders(headers\Request $headers): static
          {
             $this->headers = $headers;
             return $this;
          }
          
-      public function addHeaders(headers\Request $headers): self
+      public function addHeaders(headers\Request $headers): static
          {
             if(empty($this->headers)) $this->headers = clone $headers;
             else $this->headers->merge($headers);
@@ -39,23 +39,21 @@ class Request implements IRequest
          }
          
       
-      public function setAuth(IAuth $auth): self
+      public function setAuth(IAuth $auth): static
          {
             //TODO: refactor, don't use opts?
             $this->mergeOpts($auth->toArray());
             return $this;
          }
          
-      protected function mergeOpts(array $opts): static
+      final protected function mergeOpts(array $opts): void
          {
             $this->opts = $opts + $this->opts;
-            return $this;
          }
          
-      protected function setOpt(int $opt, $value): static
+      final protected function setOpt(int $opt, $value): void
          {
             $this->opts[$opt] = $value;
-            return $this;
          }
       
       

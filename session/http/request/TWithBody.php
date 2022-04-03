@@ -3,17 +3,9 @@ namespace lib\dp\Curl\session\http\request;
 use lib\dp\Curl\session\http;
 
 
-class WithBody extends http\Request
+trait TWithBody
    {
-      public function __construct(http\URI $url, string $method, http\body\RequestForm|http\body\RequestRaw|null $body=null)
-         {
-            parent::__construct($url, $method);
-            if(!empty($body)) $this->setBody($body);
-         }
-      
-      
-      
-      public function setBody(http\body\RequestForm|http\body\RequestRaw $body): self
+      public function setBody(http\body\RequestForm|http\body\RequestRaw $body): static
          {
             $body instanceof http\body\RequestForm?
                $this->setBodyFormData($body) :
@@ -40,4 +32,8 @@ class WithBody extends http\Request
          {
             $this->setOpt(\CURLOPT_POSTFIELDS, $data);
          }
+      
+      
+      abstract protected function addHeaders(http\headers\Request $headers);
+      abstract protected function setOpt(int $opt, $value);
    }
