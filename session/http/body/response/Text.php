@@ -5,6 +5,12 @@ use lib\dp\Curl\session\http\body\Response as ResponseBase;
 
 class Text extends ResponseBase
    {
+      protected const INTERNAL_CHARSET = 'utf8';
+      
+      
+      /**
+       * @var string|null  Charset of received body content
+       */
       protected ?string $charset = null;
       
       
@@ -22,8 +28,8 @@ class Text extends ResponseBase
        */
       final public function getDataString(): string
          {
-            return !empty($this->charset) && (strcasecmp($this->charset, 'utf8')!==0)?
-               mb_convert_encoding(parent::getDataString(), 'utf8', $this->charset) :
+            return !empty($this->charset) && (strcasecmp($this->charset, static::INTERNAL_CHARSET)!==0)?
+               mb_convert_encoding(parent::getDataString(), static::INTERNAL_CHARSET, $this->charset) :
                parent::getDataString();
          }
    }
