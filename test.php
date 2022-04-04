@@ -11,7 +11,7 @@ $req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataUrlencoded(['fo
 $req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataMultipart(['foo'=>'bar', 'baz'=>'kek-кириллица']));
 //$req->setBody(new \lib\dp\Curl\session\http\body\request\ApplicationJson(['foo'=>'bar', 'baz'=>'kek-кириллица']));
 //$req->setAuth('Basic', 'user', 'passwd');
-//$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('https://google.ru'));
+$req = new lib\dp\Curl\session\http\request\GET(new \lib\dp\Curl\session\http\URI('https://google.ru'));
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://srvweb.com/err500.php'));
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://172.30.200.10'));
 $cfg = new \lib\dp\Curl\session\http\Config();

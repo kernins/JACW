@@ -28,8 +28,22 @@ class Text extends ResponseBase
        */
       final public function getDataString(): string
          {
-            return !empty($this->charset) && (strcasecmp($this->charset, static::INTERNAL_CHARSET)!==0)?
+            return $this->_shouldConvertEncoding()?
                mb_convert_encoding(parent::getDataString(), static::INTERNAL_CHARSET, $this->charset) :
                parent::getDataString();
+         }
+         
+      private function _shouldConvertEncoding(): bool
+         {
+            return
+               !empty($this->charset) &&
+               !self::_isInternalCharset($this->charset) &&
+               !self::_isInternalCharset(preg_replace('/[^a-z\d]+/i', '', $this->charset));
+               
+         }
+         
+      private static function _isInternalCharset(string $charset): bool
+         {
+            return strcasecmp($charset, static::INTERNAL_CHARSET) === 0;
          }
    }
