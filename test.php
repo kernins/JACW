@@ -11,8 +11,8 @@ $req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataUrlencoded(['fo
 $req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataMultipart(['foo'=>'bar', 'baz'=>'kek-кириллица']));
 //$req->setBody(new \lib\dp\Curl\session\http\body\request\ApplicationJson(['foo'=>'bar', 'baz'=>'kek-кириллица']));
 //$req->setAuth('Basic', 'user', 'passwd');
-$req = new lib\dp\Curl\session\http\request\GET(new \lib\dp\Curl\session\http\URI('https://google.ru'));
-//$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://srvweb.com/err500.php'));
+//$req = new lib\dp\Curl\session\http\request\GET(new \lib\dp\Curl\session\http\URI('https://google.ru'));
+$req = new lib\dp\Curl\session\http\request\GET(new \lib\dp\Curl\session\http\URI('http://srvweb.com/err429.php'));
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://172.30.200.10'));
 $cfg = new \lib\dp\Curl\session\http\Config();
 //$cfg->returnTransfer(false);
@@ -69,8 +69,14 @@ $cfg->setOpt(CURLINFO_HEADER_OUT, true);
 $cfg->conTimo(5)->sessTimo(15);
 
 $sess=new \lib\dp\Curl\session\http\Handler($req, $cfg);
-$sess->setErrorPolicy(new lib\dp\Curl\session\http\ErrorPolicy(1, true));
-$sess->init()->execSmart();
+$sess->setErrorPolicy(new lib\dp\Curl\session\http\ErrorPolicy(
+   1,
+   true,
+   //\lib\dp\Curl\session\http\ErrorPolicy::RCP_IGNORE_CLIENTERR | \lib\dp\Curl\session\http\ErrorPolicy::RCP_IGNORE_SERVERERR
+   //\lib\dp\Curl\session\http\ErrorPolicy::RCP_IGNORE_NONE
+   //\lib\dp\Curl\session\http\ErrorPolicy::RCP_IGNORE_RATELIMIT | \lib\dp\Curl\session\http\ErrorPolicy::RCP_IGNORE_CLIENTERR
+));
+$sess->execSmart();
 //$sess->init()->execSimple();
 $resp=$sess->getResponse();
 //$resp2=$sess->exec();
@@ -82,7 +88,7 @@ fclose($file);
 //var_dump($resp->getCookies());
 //var_dump($resp->getCookies());
 //var_dump($sess->checkError());
-var_dump($resp->getStatusCode(), (string)$resp->getBody());
+var_dump($resp->getStatusCode(), (string)$resp->getBody(), $resp->getHeaders()->getRetryAfter());
 
 
 /*new \lib\dp\Curl\session\http\URI('google.ru');

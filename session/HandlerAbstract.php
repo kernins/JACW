@@ -140,8 +140,11 @@ abstract class HandlerAbstract
             $retryAttempt = 0;
             do
                {
-                  if($retryAttempt > 0)
-                     $this->reset()->init();
+                  if($retryAttempt > 0) //this iteration is a retry
+                     {
+                        if(!empty($rds=$err->getRetryDelaySeconds())) sleep($rds + 1); //with safety margin
+                        $this->reset()->init();
+                     }
                   
                   $this->execSimple();
                   $err = $this->checkError();

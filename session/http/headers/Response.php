@@ -88,6 +88,27 @@ final class Response extends BaseList
             return $ret ?? null;
          }
       
+      /**
+       * May accompany 503 or 429 responses
+       * and sometimes 3xx ones
+       * 
+       * @return \DateTimeImmutable|null
+       */
+      public function getRetryAfter(): ?\DateTimeImmutable
+         {
+            if(!empty($ra=$this->get('Retry-After')))
+               {
+                  /* According to RFC7231 #7.1.3
+                   * Retry-After = HTTP-date / delay-seconds (non-negative decimal integer)
+                   */
+                  $ret = preg_match('/^\d+$/', $ra)?
+                     \DateTimeImmutable::createFromFormat('U', time() + $ra) :
+                     \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC7231, $ra);
+               }
+            //$ret may be false
+            return empty($ret)? null : $ret;
+         }
+      
       
       public function getCookies(): http\cookies\Response
          {

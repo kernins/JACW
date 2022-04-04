@@ -62,4 +62,16 @@ class Handler extends session\HandlerAbstract
          {
             $this->response = new Response($this->infoProvider);
          }
+      
+      
+      public function checkError(): ?session\errpolicy\Error
+         {
+            $err = parent::checkError();
+            if(!empty($err) && !empty($ra=$this->getResponse()?->getHeaders()?->getRetryAfter()))
+               {
+                  //429 & 503 responses may be accompanied by Retry-After header
+                  $err->setRetryAfter($ra);
+               }
+            return $err;
+         }
    }
