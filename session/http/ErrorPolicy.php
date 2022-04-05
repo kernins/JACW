@@ -38,12 +38,28 @@ class ErrorPolicy extends errpolicy\PolicyAbstract
              */
             return match(true) {
                !($this->respCodePolicy & self::RCP_IGNORE_SERVERERR) && ($respCode>=500) =>
-                  new errpolicy\Error('Server error '.$respCode, $respCode, exception\transfer\ServerErrorException::class, $this->maxRetriesAllowed),
+                  new errpolicy\Error('Server error '.$respCode, $respCode, exception\transfer\ServerErrorException::class, ...$this->getRetriesLimitAndDelayForServerError()),
                !($this->respCodePolicy & self::RCP_IGNORE_RATELIMIT) && ($respCode==429) =>
-                  new errpolicy\Error('Server engaged rate-limiting', $respCode, exception\transfer\RateLimitException::class, 1, $this->rateLimitCooldownSec),
+                  new errpolicy\Error('Server engaged rate-limiting', $respCode, exception\transfer\RateLimitException::class, ...$this->getRetriesLimitAndDelayForRateLimitCond()),
                !($this->respCodePolicy & self::RCP_IGNORE_CLIENTERR) && ($respCode>=400) && ($respCode<500) =>
                   new errpolicy\Error('Client error '.$respCode, $respCode, exception\transfer\ClientErrorException::class, 0),
                default => null
             };
+         }
+      
+      /**
+       * @return array  [int limit, int delaySeconds]
+       */
+      protected function getRetriesLimitAndDelayForServerError(): array
+         {
+            return [$this->maxRetriesAllowed, 0];
+         }
+         
+      /**
+       * @return array  [int limit, int delaySeconds]
+       */
+      protected function getRetriesLimitAndDelayForRateLimitCond(): array
+         {
+            return [1, $this->rateLimitCooldownSec];
          }
    }
