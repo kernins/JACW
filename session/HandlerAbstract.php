@@ -142,7 +142,7 @@ abstract class HandlerAbstract
                {
                   if($retryAttempt > 0) //this iteration is a retry
                      {
-                        if(!empty($rds=$err->getRetryDelaySeconds())) sleep($rds + 1); //with safety margin
+                        if(!empty($rds=$err->getRetryDelaySeconds())) sleep($rds);
                         $this->reset()->init();
                      }
                   

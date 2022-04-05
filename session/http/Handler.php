@@ -70,7 +70,10 @@ class Handler extends session\HandlerAbstract
             if(!empty($err) && !empty($ra=$this->getResponse()?->getHeaders()?->getRetryAfter()))
                {
                   //429 & 503 responses may be accompanied by Retry-After header
-                  $err->setRetryAfter($ra);
+                  $err->setRetryAfter(
+                     //adding small safety margin to compensate for possible clock drift
+                     \DateTimeImmutable::createFromFormat('U', $ra->getTimestamp() + 1)
+                  );
                }
             return $err;
          }
