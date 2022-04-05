@@ -18,15 +18,22 @@ final class Error
       
       
       
-      public function __construct(string $message, int $code, string $throwableFQN, int $retriesAllowed=0)
+      public function __construct(string $message, int $code, string $throwableFQN, int $retriesAllowed=0, int $retryDelay=0)
          {
             $this->_message = $message;
             $this->_code = $code;
             
             $this->_throwableFQN = $throwableFQN;
             $this->_retriesAllowed = $retriesAllowed;
+            
+            if($retryDelay > 0)
+               {
+                  $this->setRetryAfter(
+                     \DateTimeImmutable::createFromFormat('U', time() + $retryDelay)
+                  );
+               }
          }
-         
+      
       public function setRetryAfter(\DateTimeInterface $dt): self
          {
             $this->_retryAfter = \DateTimeImmutable::createFromInterface($dt);

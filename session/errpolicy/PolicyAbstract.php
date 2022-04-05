@@ -30,6 +30,8 @@ abstract class PolicyAbstract
       
       public function __construct(int $maxRetries=0, bool $respRequired=true)
          {
+            if($maxRetries < 0) throw new exception\InvalidArgumentException('Retries limit may not be negative');
+         
             $this->maxRetriesAllowed = $maxRetries;
             $this->responseRequired = $respRequired;
          }
@@ -48,7 +50,7 @@ abstract class PolicyAbstract
                {
                   $curlCode = $sessIP->getLastErrorCode();
                   if(!empty($ec=$this->getKnownCurlErrorCaseForCode($curlCode)))
-                     $err = new Error($sessIP->getLastErrorMessage(), $curlCode, static::CURL_ERRORS_MAP[$ec::class], $this->getRetriesLimitForCurlError($ec));
+                     $err = new Error($sessIP->getLastErrorMessage(), $curlCode, static::CURL_ERRORS_MAP[$ec::class], ...$this->getRetriesLimitAndDelayForCurlError($ec));
                   elseif(!empty(static::THROWABLE_CURLDFLT))
                      $err = new Error($sessIP->getLastErrorMessage(), $curlCode, static::THROWABLE_CURLDFLT, 0); //non-retryable
                }
@@ -58,7 +60,7 @@ abstract class PolicyAbstract
              * but still transfer is considered successfull by libcurl
              */
             if(empty($err) && !$hasSrvResponse && $this->responseRequired)
-               $err = new Error('No response from server', $respCode, static::THROWABLE_NORESP, $this->getRetriesLimitForNoRespError());
+               $err = new Error('No response from server', $respCode, static::THROWABLE_NORESP, ...$this->getRetriesLimitAndDelayForNoRespError());
             
             return $err;
          }
@@ -83,14 +85,21 @@ abstract class PolicyAbstract
                }
             return $case;
          }
-         
-      protected function getRetriesLimitForCurlError(ICurlErrorCase $err): int
+      
+      /**
+       * @param ICurlErrorCase $err
+       * @return array  [int limit, int delaySeconds]
+       */
+      protected function getRetriesLimitAndDelayForCurlError(ICurlErrorCase $err): array
          {
-            return in_array($err::class, static::CURL_ERRORS_RETRYABLE)? $this->maxRetriesAllowed : 0;
+            return [in_array($err::class, static::CURL_ERRORS_RETRYABLE)? $this->maxRetriesAllowed:0, 0];
          }
-         
-      protected function getRetriesLimitForNoRespError(): int
+      
+      /**
+       * @return array  [int limit, int delaySeconds]
+       */
+      protected function getRetriesLimitAndDelayForNoRespError(): array
          {
-            return $this->maxRetriesAllowed;
+            return [$this->maxRetriesAllowed, 0];
          }
    }
