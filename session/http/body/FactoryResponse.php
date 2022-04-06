@@ -9,7 +9,7 @@ final class FactoryResponse extends FactoryAbstract
             $clsFQN=self::getImplFQNForContentType('response', $ct);
             $inst = empty($clsFQN)? self::newInstanceGeneric() : new $clsFQN();
             
-            if(!empty($charset) && ($inst instanceof response\Text)) $inst->setCharset($charset);
+            if(!empty($charset) && ($inst instanceof ITranscodable)) $inst->setCharset($charset);
             return $inst;
          }
          
