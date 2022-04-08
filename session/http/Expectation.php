@@ -47,15 +47,15 @@ class Expectation implements session\IExpectation, session\IRequestHintInjector
             
             if(!empty($this->respBodyType))
                {
-                  if(empty($resp)) throw new exception\UnexpectedValueException('No response received', $respCode);
-                  if(!$resp->hasBody()) throw new exception\UnexpectedValueException('Response has no body', $respCode);
-                  if(!($resp->getBody() instanceof $this->respBodyType)) throw new exception\UnexpectedValueException(
+                  if(empty($resp)) throw new exception\transfer\BadResponseException('No response received', $respCode);
+                  if(!$resp->hasBody()) throw new exception\transfer\UnexpectedResponseException('Response has no body', $respCode);
+                  if(!($resp->getBody() instanceof $this->respBodyType)) throw new exception\transfer\UnexpectedResponseException(
                      'Unexpected response body type: '.get_class($resp->getBody()),
                      $respCode
                   );
                }
          
             if(!empty($this->respStatusCodes) && !in_array($respCode, $this->respStatusCodes))
-               throw new exception\UnexpectedValueException('Unexpected response code: '.$respCode, $respCode);
+               throw new exception\transfer\UnexpectedResponseException('Unexpected status code: '.$respCode, $respCode);
          }
    }

@@ -180,7 +180,7 @@ abstract class HandlerAbstract
             try {$this->expectation?->validate($this->infoProvider, $this->getResponse());}
             catch(\RuntimeException $ex)
                {
-                  throw new exception\transfer\UnexpectedResponseException(
+                  throw new exception\transfer\ExpectationFailedException(
                      'Expectation failed: '.$ex->getMessage(),
                      $ex->getCode(),
                      $ex
