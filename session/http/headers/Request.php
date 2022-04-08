@@ -25,6 +25,17 @@ final class Request extends BaseList
          }
       
       
+      public function setContentType(string $ct): self
+         {
+            return $this->set('Content-Type', $ct);
+         }
+      
+      public function setAccept(string $ct): self
+         {
+            return $this->set('Accept', $ct);
+         }
+      
+      
       public function toArray(): array
          {
             $arr = [];

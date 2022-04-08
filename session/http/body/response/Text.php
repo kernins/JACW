@@ -3,7 +3,7 @@ namespace lib\dp\Curl\session\http\body\response;
 use lib\dp\Curl\session\http\body;
 
 
-class Text extends body\Response implements body\ITranscodable
+class Text extends TypedAbstract implements body\ITranscodable
    {
       use body\TTranscodable;
       

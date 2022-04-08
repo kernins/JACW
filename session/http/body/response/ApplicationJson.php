@@ -1,12 +1,11 @@
 <?php
 namespace lib\dp\Curl\session\http\body\response;
-use lib\dp\Curl\session\http\body\Response as ResponseBase;
 
 
 /**
  * PHP's json_decode() only works with UTF-8
  */
-class ApplicationJson extends ResponseBase
+class ApplicationJson extends TypedAbstract
    {
       public function getData(): ?array
          {

@@ -6,13 +6,13 @@ $loader->registerNamespacePath('lib\dp\Curl', __DIR__)->register();
 
 
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://srvweb.com/redirwithcook.php'));
-$req = new \lib\dp\Curl\session\http\request\POST(new \lib\dp\Curl\session\http\URI('http://srvweb.com/dump.php'));
-$req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataUrlencoded(['foo'=>'bar', 'baz'=>'kek-кириллица']));
-$req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataMultipart(['foo'=>'bar', 'baz'=>'kek-кириллица']));
+//$req = new \lib\dp\Curl\session\http\request\POST(new \lib\dp\Curl\session\http\URI('http://srvweb.com/dump.php'));
+//$req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataUrlencoded(['foo'=>'bar', 'baz'=>'kek-кириллица']));
+//$req->setBody(new \lib\dp\Curl\session\http\body\request\FormDataMultipart(['foo'=>'bar', 'baz'=>'kek-кириллица']));
 //$req->setBody(new \lib\dp\Curl\session\http\body\request\ApplicationJson(['foo'=>'bar', 'baz'=>'kek-кириллица']));
 //$req->setAuth('Basic', 'user', 'passwd');
 //$req = new lib\dp\Curl\session\http\request\GET(new \lib\dp\Curl\session\http\URI('https://google.ru'));
-$req = new lib\dp\Curl\session\http\request\GET(new \lib\dp\Curl\session\http\URI('http://srvweb.com/err429.php'));
+$req = new lib\dp\Curl\session\http\request\GET(new \lib\dp\Curl\session\http\URI('http://srvweb.com/json.php'));
 //$req = new lib\dp\Curl\session\http\Request(new \lib\dp\Curl\session\http\URI('http://172.30.200.10'));
 $cfg = new \lib\dp\Curl\session\http\Config();
 //$cfg->returnTransfer(false);
@@ -76,6 +76,25 @@ $sess->setErrorPolicy(new lib\dp\Curl\session\http\ErrorPolicy(
    //\lib\dp\Curl\session\http\ErrorPolicy::RCP_IGNORE_NONE
    //\lib\dp\Curl\session\http\ErrorPolicy::RCP_IGNORE_RATELIMIT | \lib\dp\Curl\session\http\ErrorPolicy::RCP_IGNORE_CLIENTERR
 ));
+$sess->setExpectation(
+   $exp = new lib\dp\Curl\session\http\Expectation(
+      lib\dp\Curl\session\http\body\response\ApplicationJson::class, 
+      //null,
+      [200]
+   )
+);
+
+/*var_dump(
+   \lib\dp\Curl\session\http\body\response\ApplicationJson::getHandleableContentType(),
+   \lib\dp\Curl\session\http\body\response\ApplicationOctetStream::getHandleableContentType(),
+   \lib\dp\Curl\session\http\body\response\Audio::getHandleableContentType(),
+   \lib\dp\Curl\session\http\body\response\Image::getHandleableContentType(),
+   \lib\dp\Curl\session\http\body\response\Video::getHandleableContentType(),
+   \lib\dp\Curl\session\http\body\response\Text::getHandleableContentType(),
+   $exp->getContentNegotiationHint()
+);
+die();*/
+
 $sess->execSmart();
 //$sess->init()->execSimple();
 $resp=$sess->getResponse();

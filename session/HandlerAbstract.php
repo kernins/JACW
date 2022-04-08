@@ -19,6 +19,7 @@ abstract class HandlerAbstract
       protected ?IResponse    $response = null;
       
       protected ?errpolicy\PolicyAbstract $errorPolicy = null;
+      protected ?IExpectation             $expectation = null;
       
       
       
@@ -41,7 +42,7 @@ abstract class HandlerAbstract
              * Session cleanup is now handled by CurlHandle destructor
              * TODO: remove on deprecation
              */
-            if(!empty($this->hndl)) curl_close($this->hndl);
+            curl_close($this->hndl);
          }
       
       
@@ -57,10 +58,17 @@ abstract class HandlerAbstract
             else $this->config->merge($cfg);
             return $this;
          }
-         
+      
+      
       public function setErrorPolicy(errpolicy\PolicyAbstract $errPol): static
          {
             $this->errorPolicy = $errPol;
+            return $this;
+         }
+      
+      public function setExpectation(IExpectation $expectation): static
+         {
+            $this->expectation = $expectation;
             return $this;
          }
       
@@ -103,7 +111,13 @@ abstract class HandlerAbstract
             );
             
             $this->setOptsGroup($this->config->toArray());
-            $this->setOptsGroup($this->request->toArray());
+            
+            if($this->expectation instanceof IRequestHintInjector)
+               {
+                  $req = clone $this->request;
+                  $this->expectation->injectRequestHint($req);
+               }
+            $this->setOptsGroup(($req ?? $this->request)->toArray());
             
             //FIXME: use first class callable syntax, php 8.1+
             //Using class method to allow overrides
@@ -111,7 +125,7 @@ abstract class HandlerAbstract
             
             return $this;
          }
-      
+         
       final public function reset(): static
          {
             $this->response = null;
@@ -152,12 +166,27 @@ abstract class HandlerAbstract
             while(!empty($err) && $err->isRetryable(++$retryAttempt));
             $err?->throw();
             
+            $this->validateExpectation();
             return $this;
          }
       
       public function checkError(): ?errpolicy\Error
          {
             return $this->errorPolicy?->evaluate($this->infoProvider, $this->hasResponse());
+         }
+         
+      public function validateExpectation(): static
+         {
+            try {$this->expectation?->validate($this->infoProvider, $this->getResponse());}
+            catch(\RuntimeException $ex)
+               {
+                  throw new exception\transfer\UnexpectedResponseException(
+                     'Expectation failed: '.$ex->getMessage(),
+                     $ex->getCode(),
+                     $ex
+                  );
+               }
+            return $this;
          }
       
       

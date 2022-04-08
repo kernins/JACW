@@ -10,4 +10,5 @@ interface IResponse
       public function getStatusCode(): int;
       
       public function getBody();
+      public function hasBody(): bool;
    }
