@@ -24,7 +24,7 @@ trait TWithBody
          {
             $this->setOptPostData($body->getContent());
             $this->addHeaders(
-               new http\headers\Request(['Content-Type' => $body->getContentType()])
+               (new http\headers\Request())->setContentType($body->getContentType())
             );
          }
       
