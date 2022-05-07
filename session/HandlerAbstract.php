@@ -150,17 +150,12 @@ abstract class HandlerAbstract
                __METHOD__.'() requires an ErrorPolicy to be set'
             );
             
-            $this->init();
             $retryAttempt = 0;
             do
                {
-                  if($retryAttempt > 0) //this iteration is a retry
-                     {
-                        if(!empty($rds=$err->getRetryDelaySeconds())) sleep($rds);
-                        $this->reset()->init();
-                     }
+                  if(!empty($err) && !empty($rds=$err->getRetryDelaySeconds())) sleep($rds);
                   
-                  $this->execSimple();
+                  $this->reset()->init()->execSimple();
                   $err = $this->checkError();
                }
             while(!empty($err) && $err->isRetryable(++$retryAttempt));
