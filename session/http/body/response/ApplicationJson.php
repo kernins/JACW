@@ -7,7 +7,7 @@ namespace lib\dp\Curl\session\http\body\response;
  */
 class ApplicationJson extends TypedAbstract
    {
-      public function getData(): ?array
+      public function getData()
          {
             return json_decode(
                parent::getData(),
