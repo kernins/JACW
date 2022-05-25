@@ -5,12 +5,12 @@ use lib\dp\Curl\session\http\IAuth;
 
 class Basic implements IAuth
    {
-      protected string $username;
-      protected string $password;
+      protected string  $username;
+      protected ?string $password = null;
       
       
       
-      public function __construct(string $user, string $passwd)
+      public function __construct(string $user, ?string $passwd=null)
          {
             //TODO: validation
             $this->username = $user;
