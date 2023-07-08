@@ -8,8 +8,8 @@ abstract class HandlerAbstract
       protected \CurlHandle   $hndl;
       protected InfoProvider  $infoProvider;
       
-      protected Config        $config;
-      protected IRequest      $request;
+      protected Config        $config;    //FIXME: nullable?
+      protected IRequest      $request;   //FIXME: nullable?
       
       /**
        * Meant to be initialized just-in-time (on getting actual server response),
@@ -45,6 +45,13 @@ abstract class HandlerAbstract
             curl_close($this->hndl);
          }
       
+      public function __clone(): void
+         {
+            $this->hndl = clone $this->hndl;
+            $this->infoProvider = new InfoProvider($this->hndl);
+            if(!empty($this->config)) $this->config = clone $this->config;
+         }
+      
       
       public function setRequest(IRequest $req): static
          {
@@ -66,6 +73,7 @@ abstract class HandlerAbstract
             return $this;
          }
       
+      //TODO: move to Request, should work as hint, optional strict validation
       public function setExpectation(IExpectation $expectation): static
          {
             $this->expectation = $expectation;
@@ -119,9 +127,11 @@ abstract class HandlerAbstract
                }
             $this->setOptsGroup(($req ?? $this->request)->toArray());
             
-            //FIXME: use first class callable syntax, php 8.1+
             //Using class method to allow overrides
-            $this->setOpt(\CURLOPT_WRITEFUNCTION, [$this, 'cbBodyWriter']);
+            //Using WeakRef to avoid circular references
+            $this->setOpt(\CURLOPT_WRITEFUNCTION, (function(\CurlHandle $hndl, string $chunk) {
+               return $this->get()->cbBodyWriter($hndl, $chunk);
+            })->bindTo(\WeakReference::create($this)));
             
             return $this;
          }

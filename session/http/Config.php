@@ -10,7 +10,7 @@ class Config extends session\Config
          \CURLOPT_MAXREDIRS          => 5,
          \CURLOPT_AUTOREFERER        => true,
          \CURLOPT_UNRESTRICTED_AUTH  => false,   //default FALSE, affects Authorization: (7.58.0+) and Cookie: (7.64.0+)
-         \CURLOPT_DEFAULT_PROTOCOL   => 'http'
+      //   \CURLOPT_DEFAULT_PROTOCOL   => 'http'
       ] + parent::OPTS_DEFAULT;
       
       /*protected const OPTS_LOCKED = [

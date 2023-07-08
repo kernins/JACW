@@ -13,5 +13,7 @@ class ApplicationJson extends TypedAbstract
                parent::getData(),
                flags: JSON_THROW_ON_ERROR | JSON_OBJECT_AS_ARRAY
             );
+            
+            //TODO: wrap JsonException
          }
    }

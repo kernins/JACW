@@ -30,27 +30,30 @@ class Handler extends session\HandlerAbstract
          {
             parent::init();
             
-            $this->setOpt(\CURLOPT_HEADERFUNCTION, function(\CurlHandle $cHndl, string $line) {
+            //using WeakRef to avoid circular references
+            $this->setOpt(\CURLOPT_HEADERFUNCTION, (function(\CurlHandle $cHndl, string $line) {
                $wLen = strlen($line); //orig data len
                if(strlen($line=trim($line)) > 0)
                   {
-                     if(!$this->hasResponse()) $this->initResponse(); //JIT
+                     /* @var $self Handler */
+                     $self = $this->get();
+                     if(!$self->hasResponse()) $self->initResponse(); //JIT
                      
                      $m = null;
                      if(preg_match('/^HTTP\/([\d\.]{1,3})\s+(\d{3})/i', $line, $m))
                         {
-                           $this->getResponse()->appendHeaders(
+                           $self->getResponse()->appendHeaders(
                               new headers\Response(
-                                 new URI($this->infoProvider->getInfoEffectiveURL()),
+                                 new URI($self->infoProvider->getInfoEffectiveURL()),
                                  $m[1],
                                  $m[2]
                               )
                            );
                         }
-                     else $this->getResponse()->getHeaders()->setFromHeaderLine($line);
+                     else $self->getResponse()->getHeaders()->setFromHeaderLine($line);
                   }
                return $wLen;
-            });
+            })->bindTo(\WeakReference::create($this)));
             
             //Default error policy
             if(empty($this->errorPolicy)) $this->errorPolicy = new ErrorPolicy();

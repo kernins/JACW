@@ -100,6 +100,7 @@ class Request implements IRequest
       public function __toString(): string
          {
             //not using (string)$this->url to avoid query string
-            return $this->method.' http'.($this->url->isSecure()? 's':'').'://'.$this->url->getHost().$this->url->getPath();
+            //return $this->method.' http'.($this->url->isSecure()? 's':'').'://'.$this->url->getHost().$this->url->getPath();
+            return $this->method.' '.$this->url; //with query string
          }
    }
